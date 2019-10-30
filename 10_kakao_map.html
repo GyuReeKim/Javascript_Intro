@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <div id="map" style="width:100%;height:400px;"></div>
+  <!-- html 문서의 형식이 파일이기 때문에 src에 https:를 추가해준다. -->
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0a0d219f44ee1f5ecd18379d61a3c00b"></script>
+  <script>
+    const container = document.querySelector('#map') //지도를 담을 영역의 DOM 레퍼런스
+    const options = { //지도를 생성할 때 필요한 기본 옵션
+      center: new kakao.maps.LatLng(33.450701, 126.570667), //지도의 중심좌표.
+      level: 3, //지도의 레벨(확대, 축소 정도)
+      // draggable: false // 드래그를 불가능하도록 만든다.
+    }
+    const map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+    // 전체 마커를 저장하는 배열
+    const markers = []
+
+    // 이벤트 생성
+    kakao.maps.event.addListener(map, 'click', function(e){
+      console.log(e.latLng.Ga, e.latLng.Ha)
+      createMarker(e.latLng)
+    })
+
+    // 마커를 생성하는 함수
+    const createMarker = (position) => {
+      // 마커 생성
+      const newMarker = new kakao.maps.Marker({
+        map, // map: map
+        position
+      })
+      // 마커를 생성하면 markers 리스트에 담긴다.
+      markers.push(newMarker)
+      newMarker.setMap(map)
+      console.log(markers)
+    }
+
+
+  </script>
+</body>
+</html>
