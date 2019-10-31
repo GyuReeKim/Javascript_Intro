@@ -8,8 +8,11 @@
 </head>
 <body>
   <div id="map" style="width:100%;height:400px;"></div>
+  <!-- 버튼을 클릭하면 세점의 위도 경도를 콘솔에 출력 -->
+  <button id="center">모여라</button>
   <!-- html 문서의 형식이 파일이기 때문에 src에 https:를 추가해준다. -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0a0d219f44ee1f5ecd18379d61a3c00b"></script>
+  <script src="./circumcenter.js"></script>
   <script>
     const container = document.querySelector('#map') //지도를 담을 영역의 DOM 레퍼런스
     const options = { //지도를 생성할 때 필요한 기본 옵션
@@ -18,13 +21,14 @@
       // draggable: false // 드래그를 불가능하도록 만든다.
     }
     const map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-
+    
     // 전체 마커를 저장하는 배열
     const markers = []
+    let centerMarker // let은 초기화 없이 선언이 가능하다.
 
     // 이벤트 생성
     kakao.maps.event.addListener(map, 'click', function(e){
-      console.log(e.latLng.Ga, e.latLng.Ha)
+      // console.log(e.latLng.Ga, e.latLng.Ha)
       createMarker(e.latLng)
     })
 
@@ -38,8 +42,55 @@
       // 마커를 생성하면 markers 리스트에 담긴다.
       markers.push(newMarker)
       newMarker.setMap(map)
-      console.log(markers)
+      // console.log(markers)
+
+      // 마커가 4개가 되면 가장 처음에 찍힌 마커를 지우기
+      if (markers.length > 3) {
+        markers[0].setMap(null)
+        markers.shift()
+      }
+      // console.log(markers)
     }
+
+    // 버튼 이벤트를 처리하는 함수
+    // 1. 버튼을 찾는다.
+    const btn = document.querySelector('#center')
+
+    // 2. 버튼을 클릭했을 때
+    btn.addEventListener('click', ()=>{
+      // console.log(markers)
+      // 3. markers에 저장된 정보를 콘솔에 출력한다.
+      if (markers.length === 3) {
+        // 외심을 구함
+        // console.log('마커가 3개 입니다.')
+        // 좌표 구하기
+        // console.log(markers[0].getPosition())
+        const center = circumcenter([
+          [markers[0].getPosition().Ha, markers[0].getPosition().Ga],
+          [markers[1].getPosition().Ha, markers[1].getPosition().Ga],
+          [markers[2].getPosition().Ha, markers[2].getPosition().Ga]
+        ])
+        // console.log(center)
+
+        const position = new kakao.maps.LatLng(center[0], center[1])
+        console.log(position)
+
+        // 기존의 마커가 있다면 지우고 새로운 마커 추가
+        if (centerMarker){
+          centerMarker.setMap(null)
+        }
+        // 위에서 선언한 centerMarker를 가져온다.
+        centerMarker = new kakao.maps.Marker({
+          map,
+          position
+        })
+
+      } else {
+        // 마커를 더 찍어달라고 출력
+        console.log('마커를 더 찍어주세요')
+
+      }
+    })
   </script>
 </body>
 </html>
